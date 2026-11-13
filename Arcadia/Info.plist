@@ -29,7 +29,7 @@
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
 	<key>ArcadiaBuildStage</key>
-	<string>arcadia-test-1 Distro testing candidate — native High Sierra library browser over the served arcadia-catalog/1 dataset (47 records: 29 emulators, 18 Class A films; bundled snapshot byte-identical to the served catalog at build time, refreshable in-app). Clean-room Academy source (AutomatedTechnologies/arcadia); audit + SDS-10 conformance attested by the build line on the shipped artifact 2026-11-13 (Distro files/08 rule; SDS-10 §10.5). Runtime verification is the owner's, at the Air sitting — S4 stays open until that verdict.</string>
+	<string>arcadia-test-1 Distro testing candidate — native High Sierra library browser over the served arcadia-catalog/1 dataset (74 records: 29 emulators, 18 films, 12 games, 10 audio, 5 TV; bundled snapshot byte-identical to the served catalog at build time, refreshable in-app). Clean-room Academy source (AutomatedTechnologies/arcadia); audit + SDS-10 conformance attested by the build line on the shipped artifact 2026-11-13 (Distro files/08 rule; SDS-10 §10.5). Runtime verification is the owner's, at the Air sitting — S4 stays open until that verdict.</string>
 	<key>com.detroitautomationacademy.audit</key>
 	<dict>
 		<key>Authority</key>
