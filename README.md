@@ -78,9 +78,11 @@ the `arcadia-test-1` prerelease.
 
 Bundled data: `Arcadia/Resources/arcadia-catalog.json` is a snapshot
 of the served catalog, byte-identical at build time (SHA-256
-`b3c052f8d1dfde0dbdc56620e87fcd024bb3ffbcdff06a4f30427d9b2bb4d7d7`,
-47 records: 29 emulators, 18 Class A films). The catalog is consumed
-read-only; this repo never edits the dataset.
+`5b557f4c168fe5e8cf3778d8873bf4fa484ed83f9a8d6e5c784dfce17f61e9ba`,
+95,069 B, 74 records: 29 emulators, 18 films, 12 games, 10 audio,
+5 TV — the Population Wave 1 render). All 45 media records are
+`reference-only` and the 29 emulators `none` — nothing is hosted.
+The catalog is consumed read-only; this repo never edits the dataset.
 
 ## Verification state
 
