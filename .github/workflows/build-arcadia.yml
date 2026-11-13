@@ -1,0 +1,79 @@
+name: Arcadia test build
+
+on:
+  push:
+    branches: [build-test]
+  workflow_dispatch:
+
+# The publish step creates a GitHub Release with GITHUB_TOKEN (Distro-line
+# precedent, 2026-11-07: default token needs contents: write declared).
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build app icon (iconutil, from the committed iconset)
+        run: |
+          iconutil -c icns Arcadia/Resources/AppIcon.iconset -o Arcadia/Resources/Arcadia.icns
+          ls -la Arcadia/Resources/Arcadia.icns
+
+      - name: Build app (make app — clang, unsigned, x86_64, 10.13 floor)
+        run: |
+          set -o pipefail
+          make app 2>&1 | tee clang.log
+          cp Arcadia/Resources/Arcadia.icns Arcadia.app/Contents/Resources/
+          ls -la Arcadia.app/Contents/Resources/
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clang-log
+          path: clang.log
+
+      # Build identity is FIXED at arcadia-test-1 for this build line:
+      # github.run_number counts CI attempts, not builds. The attempt
+      # number stays visible in the release notes stamp.
+      - name: Stamp build version and package app as zip
+        if: success()
+        run: |
+          APP="Arcadia.app"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion arcadia-test-1" "$APP/Contents/Info.plist"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP/Contents/Info.plist"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP/Contents/Info.plist"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$APP/Contents/Info.plist"
+          /usr/libexec/PlistBuddy -c "Print :LSMinimumSystemVersion" "$APP/Contents/Info.plist"
+          file "$APP/Contents/MacOS/Arcadia"
+          shasum -a 256 "$APP/Contents/Resources/startup-sound.wav"
+          shasum -a 256 "$APP/Contents/Resources/arcadia-catalog.json"
+          ditto -c -k --keepParent "$APP" Arcadia-test.zip
+          ls -la Arcadia-test.zip
+          shasum -a 256 Arcadia-test.zip | tee Arcadia-test.zip.sha256
+
+      - name: Upload test build zip (survival copy)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: arcadia-test-zip
+          path: |
+            Arcadia-test.zip
+            Arcadia-test.zip.sha256
+
+      - name: Publish prerelease with test build
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BUILT=$(date -u '+%Y-%m-%d %H:%M UTC')
+          NOTES="Internal test build of Arcadia, the Detroit Automation Academy's High Sierra emulation + public-domain media library for macOS High Sierra: browse the served arcadia-catalog/1 dataset by shelf and genre, read every title's traced rights basis in full, detect and open locally installed emulators, and refresh the catalog in-app (adopted only when it validates; the bundled snapshot covers offline use). Arcadia ships no commercial ROMs and no BIOS or firmware files — users supply their own files. Publisher: Detroit Automation Academy. Unsigned test build — not gate-cleared, not yet verified on the High Sierra rig; the Distro listing follows in its own tranche (testing).
+
+          BUILD STAMP — Built: $BUILT · Build: arcadia-test-1 (CI run ${{ github.run_id }}, attempt ${{ github.run_number }}) · Agent: Minion · Authorized: J. Spencer Smith, directive of 2026-11-13 (Arcadia T3 app v1)"
+          gh release create arcadia-test-1 Arcadia-test.zip \
+            --prerelease \
+            --title "Arcadia test build 1" \
+            --notes "$NOTES"
