@@ -28,8 +28,9 @@ HEADERS = \
 # startup-sound.wav: byte-identical to the SDS-10 library master,
 # SHA-256 07a113244c6b432b22954a089ce519bd239311b14a48f26ae85214ed8c25b09a.
 # arcadia-catalog.json: bundled offline snapshot, byte-identical to the
-# served catalog at build time (assets/arcadia-catalog.json),
-# SHA-256 b3c052f8d1dfde0dbdc56620e87fcd024bb3ffbcdff06a4f30427d9b2bb4d7d7.
+# served catalog at build time (assets/arcadia-catalog.json, Population
+# Wave 1 render, 74 records),
+# SHA-256 5b557f4c168fe5e8cf3778d8873bf4fa484ed83f9a8d6e5c784dfce17f61e9ba.
 RESOURCES = \
 	Arcadia/Resources/startup-sound.wav \
 	Arcadia/Resources/arcadia-catalog.json \
