@@ -1,0 +1,212 @@
+{
+  "$id": "arcadia-catalog/1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "emulator"
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "rights_class": {
+            "const": "emulator-n/a"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "distribution": {
+            "const": "hosted"
+          }
+        },
+        "required": [
+          "distribution"
+        ]
+      },
+      "then": {
+        "required": [
+          "evidence_pointer",
+          "version_pin",
+          "sha256"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "game",
+              "film",
+              "tv",
+              "audio"
+            ]
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "genre": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "genre"
+        ]
+      }
+    }
+  ],
+  "description": "Per-title record format for the Arcadia High Sierra emulation + public-domain media library. One record per title/emulator. Enforced in code by arcadia_tool.py (stdlib only); this file is the machine-readable contract for other consumers.",
+  "properties": {
+    "distribution": {
+      "description": "hosted = the Academy distributes the file (requires evidence_pointer, version_pin and sha256). reference-only = catalogued with an external locator, file not distributed by the Academy. none = catalogued only, no distribution.",
+      "enum": [
+        "hosted",
+        "reference-only",
+        "none"
+      ]
+    },
+    "evidence_pointer": {
+      "description": "URL or file path to the evidence behind rights_class / hs_compat. Required non-empty for every non-emulator record and for any record with distribution=hosted.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "genre": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "description": "Primary genre a librarian would shelve the work under. REQUIRED non-empty for media records (kind game|film|tv|audio) — Population Wave 1 is organized as genre shelves. Must be null for kind=emulator (genre n/a). Film shelf cuts of record: horror / comedy / drama / animation / documentary-actuality."
+    },
+    "hs_compat": {
+      "description": "High Sierra (macOS 10.13) state: compatible = a 10.13 build path is evidenced; candidate = HS-era build known, exact pin owed; excluded = floor above 10.13, with the floor evidence in notes; not-applicable = media works.",
+      "enum": [
+        "compatible",
+        "candidate",
+        "excluded",
+        "not-applicable"
+      ]
+    },
+    "hs_evidence_class": {
+      "description": "Verified = primary source read. Source Checked = credible secondary/project source read. Candidate = pin/status owed. Nothing is Rig Verified at this layer.",
+      "enum": [
+        "Verified",
+        "Source Checked",
+        "Candidate"
+      ]
+    },
+    "id": {
+      "description": "Stable slug, unique in the dataset. Never reused for a different work.",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "emulator",
+        "game",
+        "film",
+        "tv",
+        "audio"
+      ]
+    },
+    "license": {
+      "description": "Software/work license as stated in the source of record; null when the source states none.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "notes": {
+      "type": "string"
+    },
+    "rights_basis": {
+      "description": "The traced basis for listing this work, in words. Required non-empty for every non-emulator record; for emulators it states that no copyrighted ROM/BIOS content is catalogued and names the software license of record.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rights_class": {
+      "description": "A = US public domain by age (published 1930 or earlier). B = PD by non-renewal or defective notice (per-title evidence file required). C = US government work. open-license = homebrew / openly-licensed with the grant traced. emulator-n/a = emulator software record (kind=emulator only).",
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "open-license",
+        "emulator-n/a"
+      ]
+    },
+    "sha256": {
+      "description": "SHA-256 of the distributed file. Only present where a file is distributed (distribution=hosted); a truncated hash is never stored here.",
+      "pattern": "^[0-9a-f]{64}$",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source": {
+      "description": "Canonical project/archive locator: an https/http URL where one is on record, otherwise an explicit locator string naming where the canonical source is owed from. Required non-empty for every emulator record.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "system": {
+      "description": "System/platform: the emulated system for emulators and games; the medium for media works (e.g. 'Film').",
+      "minLength": 1,
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "version_pin": {
+      "description": "Exact pinned version where one is verified. Null while a pin is owed — approximate versions live in notes, never here.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "year": {
+      "description": "Publication/release year where the list of record states one (media works); null otherwise.",
+      "type": [
+        "integer",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "kind",
+    "system",
+    "genre",
+    "rights_class",
+    "rights_basis",
+    "evidence_pointer",
+    "source",
+    "version_pin",
+    "sha256",
+    "hs_compat",
+    "hs_evidence_class",
+    "distribution"
+  ],
+  "title": "Arcadia catalog record",
+  "type": "object"
+}
